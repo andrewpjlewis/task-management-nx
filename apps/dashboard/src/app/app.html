@@ -1,0 +1,8 @@
+<div class="app-header">
+  <h1>Task Dashboard</h1>
+  <button *ngIf="isLoggedIn$ | async" class="btn btn-secondary" (click)="logout()">
+    Logout
+  </button>
+</div>
+
+<router-outlet></router-outlet>

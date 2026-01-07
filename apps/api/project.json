@@ -4,11 +4,6 @@
   "sourceRoot": "apps/api/src",
   "projectType": "application",
   "tags": ["scope:api"],
-  "release": {
-    "docker": {
-      "repositoryName": "org/angular-template-api"
-    }
-  },
   "targets": {
     "build": {
       "executor": "@nx/esbuild:esbuild",
@@ -16,12 +11,11 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "apps/api/dist",
+        "outputPath": "dist/apps/api",
         "format": ["cjs"],
-        "bundle": false,
+        "bundle": true,
         "main": "apps/api/src/main.ts",
         "tsConfig": "apps/api/tsconfig.app.json",
-        "assets": ["apps/api/src/assets"],
         "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,
@@ -31,26 +25,24 @@
         }
       },
       "configurations": {
-        "development": {},
-        "production": {
-          "generateLockfile": true,
+        "development": {
           "esbuildOptions": {
-            "sourcemap": false,
-            "outExtension": {
-              ".js": ".js"
-            }
+            "sourcemap": true
+          }
+        },
+        "production": {
+          "esbuildOptions": {
+            "sourcemap": false
           }
         }
       }
     },
     "serve": {
-      "continuous": true,
       "executor": "@nx/js:node",
       "defaultConfiguration": "development",
       "dependsOn": ["build"],
       "options": {
-        "buildTarget": "api:build",
-        "runBuildTargetDependencies": false
+        "buildTarget": "api:build:development"
       },
       "configurations": {
         "development": {
@@ -62,12 +54,12 @@
       }
     },
     "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/api"],
       "options": {
+        "jestConfig": "apps/api/jest.config.ts",
         "passWithNoTests": true
       }
-    },
-    "docker:build": {
-      "dependsOn": ["build"]
     }
   }
 }

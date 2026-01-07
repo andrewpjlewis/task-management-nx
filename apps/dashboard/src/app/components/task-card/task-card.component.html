@@ -1,0 +1,5 @@
+<div class="task-card">
+  <h3>{{ task.title }}</h3>
+  <p *ngIf="task.description">{{ task.description }}</p>
+  <p>Status: {{ task.completed ? '✅ Completed' : '🕓 Pending' }}</p>
+</div>
