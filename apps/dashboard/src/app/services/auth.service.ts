@@ -1,20 +1,28 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, map } from 'rxjs';
 import { Router } from '@angular/router';
+
+interface LoginResponse {
+  access_token: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  private baseUrl = 'http://localhost:3333/auth';
   private loggedIn = new BehaviorSubject<boolean>(!!localStorage.getItem('token'));
 
-  constructor(private router: Router) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
-  login(username: string, password: string) {
-    // Call API instead in real app
-    localStorage.setItem('token', 'fake-jwt-token');
-    this.loggedIn.next(true);
-    this.router.navigate(['/tasks']);
+  login(email: string, password: string): Observable<void> {
+    return this.http.post<LoginResponse>(`${this.baseUrl}/login`, { email, password }).pipe(
+      map((res) => {
+        localStorage.setItem('token', res.access_token);
+        this.loggedIn.next(true);
+      })
+    );
   }
 
   logout() {

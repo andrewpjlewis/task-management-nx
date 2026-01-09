@@ -1,12 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
+import { AuthService } from '../../services/auth.service';
 
 interface Task {
   id: number;
   title: string;
-  category: string;
+  description?: string;
   completed: boolean;
   editing?: boolean;
 }
@@ -18,26 +19,32 @@ interface Task {
   styleUrls: ['./tasks.component.css'],
   imports: [CommonModule, FormsModule, DragDropModule],
 })
-export class TasksComponent {
-  tasks: Task[] = [
-    { id: 1, title: 'Buy groceries', category: 'Personal', completed: false },
-    { id: 2, title: 'Finish report', category: 'Work', completed: true },
-  ];
+export class TasksComponent implements OnInit {
+  tasks: Task[] = [];
   newTaskTitle = '';
-  newTaskCategory = 'Personal';
-  categories = ['Work', 'Personal', 'Other'];
-  sortBy: 'title' | 'completed' | 'category' = 'title';
+  newTaskDescription = '';
+
+  constructor(private auth: AuthService) {}
+
+  ngOnInit() {
+    // Example initial tasks
+    this.tasks = [
+      { id: 1, title: 'Buy groceries', description: 'Milk, Eggs, Bread', completed: false },
+      { id: 2, title: 'Finish report', description: 'Due Monday', completed: true },
+    ];
+  }
 
   addTask() {
     if (!this.newTaskTitle.trim()) return;
-    const id = this.tasks.length + 1;
+    const id = this.tasks.length ? Math.max(...this.tasks.map(t => t.id)) + 1 : 1;
     this.tasks.push({
       id,
       title: this.newTaskTitle,
-      category: this.newTaskCategory,
+      description: this.newTaskDescription,
       completed: false,
     });
     this.newTaskTitle = '';
+    this.newTaskDescription = '';
   }
 
   editTask(task: Task) {
@@ -52,8 +59,8 @@ export class TasksComponent {
     task.editing = false;
   }
 
-  removeTask(id: number) {
-    this.tasks = this.tasks.filter(t => t.id !== id);
+  removeTask(task: Task) {
+    this.tasks = this.tasks.filter(t => t.id !== task.id);
   }
 
   toggleComplete(task: Task) {
@@ -64,13 +71,7 @@ export class TasksComponent {
     moveItemInArray(this.tasks, event.previousIndex, event.currentIndex);
   }
 
-  setSort(field: 'title' | 'completed' | 'category') {
-    this.sortBy = field;
-    this.tasks.sort((a, b) => {
-      if (field === 'title' || field === 'category') {
-        return a[field].localeCompare(b[field]);
-      }
-      return Number(a.completed) - Number(b.completed);
-    });
+  logout() {
+    this.auth.logout();
   }
 }

@@ -1,6 +1,7 @@
 <div class="panel panel-default">
   <div class="panel-heading">
     <span class="title">Tasks</span>
+    <button class="btn btn-secondary" (click)="logout()">Logout</button>
   </div>
 
   <div class="panel-body">
@@ -9,7 +10,12 @@
         <div class="task-left">
           <input type="checkbox" [checked]="task.completed" (change)="toggleComplete(task)" />
           <span *ngIf="!task.editing" [class.completed]="task.completed">{{ task.title }}</span>
-          <input *ngIf="task.editing" [(ngModel)]="task.title" class="edit-input" />
+          <input *ngIf="task.editing" [(ngModel)]="task.title" class="edit-input" placeholder="Task title" />
+        </div>
+
+        <div *ngIf="!task.editing && task.description" class="task-description">{{ task.description }}</div>
+        <div *ngIf="task.editing">
+          <textarea [(ngModel)]="task.description" class="edit-input" placeholder="Task description"></textarea>
         </div>
 
         <div class="task-section">
@@ -18,16 +24,14 @@
             <button *ngIf="task.editing" class="btn btn-success" (click)="saveTask(task)">Save</button>
             <button *ngIf="task.editing" class="btn btn-secondary" (click)="cancelEdit(task)">Cancel</button>
           </div>
-          <button class="btn btn-danger" (click)="removeTask(task.id)">X</button>
+          <button class="btn btn-danger" (click)="removeTask(task)">Delete</button>
         </div>
       </div>
     </div>
 
     <div class="new-task-wrapper">
       <input [(ngModel)]="newTaskTitle" placeholder="New task" class="new-task-input" />
-      <select [(ngModel)]="newTaskCategory" class="new-task-input">
-        <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
-      </select>
+      <input [(ngModel)]="newTaskDescription" placeholder="Description (optional)" class="new-task-input" />
       <button class="btn btn-primary" (click)="addTask()">Add</button>
     </div>
   </div>

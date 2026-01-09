@@ -5,15 +5,16 @@ import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
+import { Organization } from '../entities/organization.entity';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Organization]),
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'default_secret',
+      secret: process.env.JWT_SECRET || 'supersecret',
       signOptions: { expiresIn: '1h' },
     }),
   ],

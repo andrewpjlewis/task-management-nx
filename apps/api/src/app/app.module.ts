@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { TasksModule } from './tasks/tasks.module';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
@@ -10,19 +11,18 @@ import { Organization } from './entities/organization.entity';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
-      type: 'sqlite', // or 'postgres'
-      database: 'data.db', // file name for SQLite
+      type: 'postgres',
+      url: process.env.DATABASE_URL,
       entities: [User, Task, Organization],
-      synchronize: true, // auto-create tables (good for dev/test)
+      synchronize: true,
+      ssl: { rejectUnauthorized: false },
     }),
     TasksModule,
     AuthModule,
-    TypeOrmModule.forFeature([User, Task, Organization]), // optional in root module
   ],
   controllers: [],
-  providers: [
-    { provide: APP_GUARD, useClass: RolesGuard },
-  ],
+  providers: [{ provide: APP_GUARD, useClass: RolesGuard }],
 })
 export class AppModule {}

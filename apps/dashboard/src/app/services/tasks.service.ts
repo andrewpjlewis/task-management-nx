@@ -1,34 +1,39 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { Task } from '../models/task.model';
 
 @Injectable({ providedIn: 'root' })
 export class TasksService {
   private tasks = new BehaviorSubject<Task[]>([
-    { id: 1, title: 'Buy groceries', completed: false },
-    { id: 2, title: 'Finish report', completed: true },
+    { id: 1, title: 'Buy groceries', completed: false, description: '' },
+    { id: 2, title: 'Finish report', completed: true, description: '' },
   ]);
 
   getTasks(): Observable<Task[]> {
     return this.tasks.asObservable();
   }
 
-  addTask(task: Task) {
+  addTask(task: Task): Observable<Task> {
     const current = this.tasks.value;
-    this.tasks.next([...current, task]);
+    const newTask = { ...task, id: current.length + 1 };
+    this.tasks.next([...current, newTask]);
+    return of(newTask);
   }
 
-  updateTask(updated: Task) {
-    const current = this.tasks.value.map(t => t.id === updated.id ? updated : t);
+  updateTask(task: Task): Observable<Task> {
+    const current = this.tasks.value.map(t => (t.id === task.id ? task : t));
     this.tasks.next(current);
+    return of(task);
   }
 
-  removeTask(id: number) {
+  removeTask(id: number): Observable<void> {
     const current = this.tasks.value.filter(t => t.id !== id);
     this.tasks.next(current);
+    return of(undefined);
   }
 
-  reorderTasks(tasks: Task[]) {
+  reorderTasks(tasks: Task[]): Observable<Task[]> {
     this.tasks.next(tasks);
+    return of(tasks);
   }
 }

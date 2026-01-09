@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   standalone: true,
@@ -13,15 +14,21 @@ export class LoginComponent {
   email = '';
   password = '';
   error: string | null = null;
+  loading = false;
 
-  constructor(private router: Router) {}
+  constructor(private auth: AuthService, private router: Router) {}
 
-  login() {
-    if (this.email === 'admin@example.com' && this.password === 'password') {
-      localStorage.setItem('token', 'dummy');
+  async login() {
+    this.error = null;
+    this.loading = true;
+
+    try {
+      await this.auth.login(this.email, this.password);
       this.router.navigate(['/tasks']);
-    } else {
-      this.error = 'Invalid credentials';
+    } catch (err: any) {
+      this.error = err?.error?.message || 'Login failed';
+    } finally {
+      this.loading = false;
     }
   }
 }
